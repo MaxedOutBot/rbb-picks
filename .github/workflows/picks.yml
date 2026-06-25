@@ -13,25 +13,17 @@ jobs:
     permissions:
       contents: write
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-      - name: Set up Python
-        uses: actions/setup-python@v5
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
         with:
           python-version: '3.11'
-      - name: Install dependencies
-        run: pip install requests
-      - name: Run picks engine
+      - run: pip install requests
+      - run: python picks_engine.py
         env:
           ODDS_API_KEY: ${{ secrets.ODDS_API_KEY }}
-        run: python picks_engine.py
-      - name: Commit and push
-        run: |
-          git config --local user.email "picks@ricsbestbets.com"
-          git config --local user.name "Manhattan Model Bot"
-          git add pending_picks.json || true
-          git add picks.json || true
-          git diff --staged --quiet || git commit -m "Auto picks update"
-          git push || true
-      - name: Done
-        run: echo "Engine complete"
+      - run: |
+          git config user.email "picks@ricsbestbets.com"
+          git config user.name "RBB Bot"
+          git add -A
+          git diff --staged --quiet || git commit -m "picks update"
+          git push
