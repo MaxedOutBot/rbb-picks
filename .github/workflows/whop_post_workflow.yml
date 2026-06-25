@@ -1,0 +1,28 @@
+name: Auto-Post to WHOP
+
+on:
+  push:
+    paths:
+      - 'picks.json'
+    branches:
+      - main
+
+jobs:
+  post-to-whop:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install dependencies
+        run: pip install requests
+      - name: Post picks to WHOP
+        env:
+          WHOP_API_KEY: ${{ secrets.WHOP_API_KEY }}
+          WHOP_PRODUCT_ID: ${{ secrets.WHOP_PRODUCT_ID }}
+        run: python post_to_whop.py
+      - name: Done
+        run: echo "WHOP posting complete"
