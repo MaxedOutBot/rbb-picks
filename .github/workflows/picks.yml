@@ -29,10 +29,9 @@ jobs:
         run: |
           git config --local user.email "picks@ricsbestbets.com"
           git config --local user.name "Manhattan Model Bot"
-          git add pending_picks.json
-git add picks.json 2>/dev/null || true
-
+          git add pending_picks.json || true
+          git add picks.json || true
           git diff --staged --quiet || git commit -m "Auto picks update"
-          git push
+          git push || true
       - name: Done
         run: echo "Engine complete"
