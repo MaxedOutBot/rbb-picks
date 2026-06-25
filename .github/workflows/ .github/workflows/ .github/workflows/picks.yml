@@ -1,0 +1,36 @@
+name: Manhattan Model Auto Picks
+
+on:
+  schedule:
+    - cron: '0 18 * * *'
+    - cron: '59 21 * * *'
+    - cron: '29 1 * * *'
+  workflow_dispatch:
+
+jobs:
+  generate-picks:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install dependencies
+        run: pip install requests
+      - name: Run picks engine
+        env:
+          ODDS_API_KEY: ${{ secrets.ODDS_API_KEY }}
+        run: python picks_engine.py
+      - name: Commit and push
+        run: |
+          git config --local user.email "picks@ricsbestbets.com"
+          git config --local user.name "Manhattan Model Bot"
+          git add pending_picks.json picks.json
+          git diff --staged --quiet || git commit -m "Auto picks update"
+          git push
+      - name: Done
+        run: echo "Engine complete"
