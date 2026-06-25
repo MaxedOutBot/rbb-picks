@@ -1,0 +1,26 @@
+name: Manhattan Model Auto Picks
+on:
+  schedule:
+    - cron: '0 18 * * *'
+    - cron: '59 21 * * *'
+    - cron: '29 1 * * *'
+  workflow_dispatch:
+jobs:
+  generate-picks:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: pip install requests
+      - run: python picks_engine.py
+        env:
+          ODDS_API_KEY: ${{ secrets.ODDS_API_KEY }}
+      - run: git config user.email "picks@ricsbestbets.com"
+      - run: git config user.name "RBB Bot"
+      - run: git add -A || true
+      - run: git diff --staged --quiet || git commit -m "picks update" || true
+      - run: git push || true
