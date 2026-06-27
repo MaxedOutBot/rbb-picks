@@ -1,4 +1,4 @@
-toml[[redirects]]
+[[redirects]]
   from = "/tracker"
   to = "/tracker.html"
   status = 200
