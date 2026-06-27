@@ -1,26 +1,38 @@
 name: Manhattan Model Auto Picks
+
 on:
   schedule:
-    - cron: '0 18 * * *'
-    - cron: '59 21 * * *'
-    - cron: '29 1 * * *'
+    - cron: '0 18 * * *'    # 11:00am PT — morning board scan
+    - cron: '59 21 * * *'   # 2:59pm PT  — main card release
+    - cron: '45 0 * * *'    # 5:45pm PT  — late game additions
   workflow_dispatch:
+
 jobs:
   generate-picks:
     runs-on: ubuntu-latest
-    permissions:
-      contents: write
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
+      - name: Checkout repo
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
         with:
           python-version: '3.11'
-      - run: pip install requests
-      - run: python picks_engine.py
+
+      - name: Install dependencies
+        run: pip install requests
+
+      - name: Run Manhattan Model
         env:
           ODDS_API_KEY: ${{ secrets.ODDS_API_KEY }}
-      - run: git config user.email "picks@ricsbestbets.com"
-      - run: git config user.name "RBB Bot"
-      - run: git add -A || true
-      - run: git diff --staged --quiet || git commit -m "picks update" || true
-      - run: git push || true
+        run: python picks_engine.py
+
+      - name: Notify Ric — picks ready for approval
+        env:
+          RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
+          RIC_EMAIL:      ${{ secrets.FROM_EMAIL }}
+          TWILIO_SID:     ${{ secrets.TWILIO_SID }}
+          TWILIO_TOKEN:   ${{ secrets.TWILIO_TOKEN }}
+          TWILIO_FROM:    ${{ secrets.TWILIO_FROM }}
+          RIC_PHONE:      ${{ secrets.RIC_PHONE }}
+        run: python notify_ric.py
