@@ -1,0 +1,9 @@
+toml[[redirects]]
+  from = "/tracker"
+  to = "/tracker.html"
+  status = 200
+
+[[redirects]]
+  from = "/last10"
+  to = "/last10.html"
+  status = 200
