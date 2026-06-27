@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>2026 Pick Tracker | RicsBestBets</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;600;700&family=Rajdhani:wght@400;600;700&family=Barlow+Condensed:wght@300;400;600&display=swap" rel="stylesheet">
+<style>
+
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{background:#07101f;color:#F6F5F2;font-family:'Barlow Condensed',sans-serif;min-height:100vh}
+a{text-decoration:none}
+
+/* ── Nav ── */
+.site-nav{background:#030b17;border-bottom:1px solid rgba(201,162,39,0.2);padding:0 20px;display:flex;align-items:center;justify-content:space-between;height:52px;position:sticky;top:0;z-index:100}
+.site-nav .logo{font-family:'Oswald',sans-serif;font-size:14px;font-weight:700;color:#c9a227;letter-spacing:0.12em}
+.nav-links{display:flex;gap:4px}
+.nav-links a{font-family:'Rajdhani',sans-serif;font-size:12px;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;padding:6px 12px;border-radius:4px;color:#a7adb5;transition:all 0.15s}
+.nav-links a:hover,.nav-links a.active{color:#c9a227;background:rgba(201,162,39,0.08)}
+
+/* ── Page header ── */
+.page-header{background:linear-gradient(180deg,#030b17 0%,#07101f 100%);padding:32px 20px 24px;text-align:center;border-bottom:3px solid #c9a227}
+.page-header .eyebrow{font-size:10px;letter-spacing:0.3em;text-transform:uppercase;color:#c9a227;margin-bottom:8px}
+.page-header h1{font-family:'Oswald',sans-serif;font-size:clamp(22px,5vw,36px);font-weight:700;color:#F6F5F2;text-transform:uppercase;letter-spacing:0.04em;margin-bottom:6px}
+.page-header .sub{font-size:12px;color:#a7adb5;letter-spacing:0.06em;font-style:italic}
+
+/* ── Dashboard cards ── */
+.cards-wrap{max-width:960px;margin:0 auto;padding:24px 16px 8px;display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px}
+.card{background:rgba(13,31,60,0.95);border:1px solid rgba(201,162,39,0.25);border-radius:8px;padding:16px 14px 14px;text-align:center;position:relative;overflow:hidden}
+.card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:#c9a227}
+.card-label{font-size:9px;font-weight:700;letter-spacing:0.22em;text-transform:uppercase;color:#c9a227;margin-bottom:10px}
+.card-value{font-family:'Oswald',sans-serif;font-size:clamp(26px,5vw,36px);font-weight:700;line-height:1;margin-bottom:6px}
+.card-sub{font-size:10px;color:#a7adb5;letter-spacing:0.06em}
+.card-value.green{color:#22c55e}
+.card-value.gold{color:#c9a227}
+.card-value.white{color:#F6F5F2}
+.card-value.blue{color:#2e78d8}
+
+/* ── Loading ── */
+.loading{text-align:center;padding:60px 20px;color:#a7adb5;font-size:14px;letter-spacing:0.1em}
+.loading span{display:inline-block;animation:pulse 1.4s ease-in-out infinite}
+@keyframes pulse{0%,100%{opacity:0.4}50%{opacity:1}}
+
+/* ── Table ── */
+.table-wrap{max-width:960px;margin:0 auto;padding:8px 16px 40px;overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:13px}
+thead th{background:#030b17;color:#c9a227;font-family:'Rajdhani',sans-serif;font-size:10px;font-weight:700;letter-spacing:0.18em;text-transform:uppercase;padding:10px 12px;border-bottom:2px solid #c9a227;white-space:nowrap}
+tbody tr{border-bottom:1px solid rgba(30,58,90,0.7);transition:background 0.1s}
+tbody tr:hover{background:rgba(46,120,216,0.04)}
+tbody tr.win-row{background:rgba(10,34,16,0.6)}
+tbody tr.loss-row{background:rgba(43,10,10,0.5)}
+tbody td{padding:9px 12px;vertical-align:middle}
+.td-date{color:#a7adb5;font-size:11px;white-space:nowrap;font-variant-numeric:tabular-nums;text-align:center}
+.td-pick{color:#F6F5F2;font-size:13px}
+.td-result{text-align:center;font-family:'Oswald',sans-serif;font-size:14px;font-weight:700}
+.td-result.w{color:#22c55e}
+.td-result.l{color:#ef4444}
+.td-record{text-align:center;font-family:'Rajdhani',sans-serif;font-size:12px;font-weight:600;color:#a7adb5;white-space:nowrap}
+
+/* ── Big summary card (last10 page) ── */
+.summary-wrap{max-width:480px;margin:24px auto 8px;padding:0 16px}
+.summary-card{background:rgba(13,31,60,0.95);border:1px solid #c9a227;border-radius:10px;padding:28px 20px 24px;text-align:center;position:relative}
+.summary-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,transparent,#c9a227,transparent);border-radius:10px 10px 0 0}
+.summary-card .s-label{font-size:10px;letter-spacing:0.25em;text-transform:uppercase;color:#c9a227;margin-bottom:14px}
+.summary-card .s-value{font-family:'Oswald',sans-serif;font-size:clamp(48px,12vw,72px);font-weight:700;color:#22c55e;line-height:1;margin-bottom:8px;letter-spacing:0.02em}
+.summary-card .s-pct{font-family:'Rajdhani',sans-serif;font-size:22px;font-weight:700;color:#c9a227;margin-bottom:8px}
+.summary-card .s-sub{font-size:11px;color:#a7adb5;letter-spacing:0.08em}
+
+/* ── Footer ── */
+.page-footer{text-align:center;padding:32px 20px;border-top:1px solid rgba(30,58,90,0.5);color:#4a5568;font-size:11px;letter-spacing:0.06em;line-height:1.8}
+.page-footer a{color:#2e78d8}
+
+
+</style>
+</head>
+<body>
+<nav class="site-nav">
+  <a href="/" class="logo">RicsBestBets</a>
+  <div class="nav-links">
+    <a href="/">Home</a>
+    <a href="/last10.html">Last 10</a>
+    <a href="/tracker.html" class="active">2026 Tracker</a>
+  </div>
+</nav>
+<div class="page-header">
+  <div class="eyebrow">Manhattan Model V11 · Verified Analytics</div>
+  <h1>Free Pick Tracker · 2026</h1>
+  <div class="sub">Verified record updated after every final score &nbsp;·&nbsp; Every free pick tracked since January 1, 2026</div>
+</div>
+
+<div class="cards-wrap">
+  <div class="card"><div class="card-label">Overall Record</div><div class="card-value green" id="c-record">—</div><div class="card-sub">Since Jan 1, 2026</div></div>
+  <div class="card"><div class="card-label">Win Rate</div><div class="card-value gold" id="c-pct">—</div><div class="card-sub" id="c-total">— Picks Tracked</div></div>
+  <div class="card"><div class="card-label">Current Streak</div><div class="card-value white" id="c-streak">—</div><div class="card-sub">Consecutive results</div></div>
+  <div class="card"><div class="card-label">Units Profit</div><div class="card-value green" id="c-units">—</div><div class="card-sub" id="c-usub">Auto-calculated</div></div>
+</div>
+<div class="table-wrap">
+  <div class="loading" id="loading"><span>Loading picks...</span></div>
+  <table id="tbl" style="display:none">
+    <thead><tr>
+      <th style="text-align:center">Date</th>
+      <th style="text-align:left">Pick / Bet</th>
+      <th style="text-align:center">Result</th>
+      <th style="text-align:center;color:rgba(201,162,39,0.6)">Units ★</th>
+      <th style="text-align:center;color:rgba(201,162,39,0.6)">Profit</th>
+      <th style="text-align:center">All-Time Record</th>
+    </tr></thead>
+    <tbody id="tbody"></tbody>
+    <tfoot id="tfoot" style="display:none"><tr>
+      <td colspan="3" style="padding:10px 12px;color:#c9a227;font-family:'Rajdhani',sans-serif;font-weight:700;font-size:11px;letter-spacing:0.1em;text-transform:uppercase">Season Total</td>
+      <td id="tf-w" style="text-align:center;padding:10px 12px;color:#a7adb5;font-size:11px"></td>
+      <td id="tf-p" style="text-align:center;padding:10px 12px;font-family:'Oswald',sans-serif;font-size:15px;font-weight:700"></td>
+      <td></td>
+    </tr></tfoot>
+  </table>
+</div>
+<div class="page-footer">
+  Every free pick is permanently archived. Nothing deleted. Nothing hidden.<br>
+  Units assigned automatically by Manhattan Model: 1★=0.5u &nbsp;2★=1u &nbsp;3★=1.5u &nbsp;4★=2u &nbsp;5★=3u<br>
+  Profit calculated at actual odds. Picks before unit tracking show — in the units column.<br><br>
+  <a href="/last10.html">← Last 10</a> &nbsp;·&nbsp; <a href="/">← ricsbestbets.com</a>
+</div>
+<script>
+
+const SHEETS_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSQLan_accx3V2_Af32tKWx0gxNMAXC5-xp4nLGmfBrFaTUOsq6dPGg-C5dtsHBhg8WsTm2ncb2fLup/pub?gid=1587542725&single=true&output=csv';
+const LOG_URL    = 'https://raw.githubusercontent.com/MaxedOutBot/rbb-picks/main/picks_log.json';
+
+function parseCSV(text) {
+  return text.split('\n').map(row => {
+    const cols = []; let cur = '', inQ = false;
+    for (let i = 0; i < row.length; i++) {
+      if (row[i] === '"') { inQ = !inQ; }
+      else if (row[i] === ',' && !inQ) { cols.push(cur.trim()); cur = ''; }
+      else cur += row[i];
+    }
+    cols.push(cur.trim()); return cols;
+  });
+}
+
+function parseDate(str) {
+  const p = str.trim().replace(/"/g,'').split('-');
+  if (p.length !== 3) return '';
+  return '20' + p[2] + '-' + p[0] + '-' + p[1];
+}
+
+function calcUnitProfit(result, units, odds) {
+  if (!units || units <= 0) return null;
+  const n = parseFloat(String(odds || '').replace(/[^0-9.-]/g,''));
+  const mult = !isNaN(n) && n < 0 ? (100 / Math.abs(n))
+             : (!isNaN(n) && n > 0 ? (n / 100) : 0.909);
+  return result === 'W' ? +(units * mult).toFixed(4) : -units;
+}
+
+async function fetchData() {
+  const [sheetResp, logResp] = await Promise.all([
+    fetch(SHEETS_URL + '&nocache=' + Date.now(), {cache:'no-store'}),
+    fetch(LOG_URL + '?t=' + Date.now(), {cache:'no-store'}).catch(() => null)
+  ]);
+
+  // Build units lookup from picks_log.json keyed by MM-DD-YY date
+  const uLookup = {};
+  if (logResp && logResp.ok) {
+    try {
+      const log = await logResp.json();
+      log.forEach(e => {
+        uLookup[e.date] = { units: e.units || 1.0, odds: e.odds || '', stars: e.stars || 0 };
+      });
+    } catch(e) {}
+  }
+
+  if (!sheetResp.ok) throw new Error('Sheet unavailable');
+  const rows = parseCSV(await sheetResp.text());
+  const picks = [];
+
+  for (const row of rows) {
+    if (!row || row.length < 3) continue;
+    const result = (row[2]||'').replace(/"/g,'').trim().toUpperCase();
+    if (result !== 'W' && result !== 'L') continue;
+    const date   = (row[0]||'').replace(/"/g,'').trim();
+    const pick   = (row[1]||'').replace(/"/g,'').trim();
+    const record = (row[3]||'').replace(/"/g,'').trim();
+    const lu     = uLookup[date] || {};
+    const units  = lu.units || parseFloat((row[4]||'').replace(/"/g,'')) || null;
+    const odds   = lu.odds  || (row[5]||'').replace(/"/g,'').trim() || null;
+    const profit = calcUnitProfit(result, units, odds);
+    picks.push({ date, pick, result, record, units, odds, profit, sortKey: parseDate(date) });
+  }
+  picks.sort((a,b) => b.sortKey.localeCompare(a.sortKey));
+  return picks;
+}
+
+function calcStats(picks) {
+  const w = picks.filter(p => p.result==='W').length;
+  const l = picks.filter(p => p.result==='L').length;
+  const total = w + l;
+  const pct = total > 0 ? (w/total*100).toFixed(1) : '0.0';
+  let streak = 0, st = '';
+  if (picks.length) {
+    st = picks[0].result;
+    for (const p of picks) { if (p.result===st) streak++; else break; }
+  }
+  const streakStr = st==='W' ? ('🔥 W'+streak) : (st ? ('❌ L'+streak) : '—');
+  const hasU = picks.some(p => p.units !== null);
+  const totP = hasU ? picks.reduce((s,p)=>s+(p.profit||0),0) : null;
+  return { w, l, total, pct, streakStr, hasU, totP };
+}
+
+function calcLast10(picks) {
+  const t = picks.slice(0,10);
+  const w = t.filter(p=>p.result==='W').length;
+  const l = t.filter(p=>p.result==='L').length;
+  const pct = (w+l)>0 ? Math.round(w/(w+l)*100) : 0;
+  const hasU = t.some(p=>p.units!==null);
+  const totP = hasU ? t.reduce((s,p)=>s+(p.profit||0),0) : null;
+  return { w, l, pct, hasU, totP };
+}
+
+function fmt(val) {
+  if (val===null) return null;
+  return (val>=0?'+':'')+val.toFixed(2)+'u';
+}
+
+
+async function init() {
+  try {
+    const picks = await fetchData();
+    const s = calcStats(picks);
+    document.getElementById('c-record').textContent = s.w + ' - ' + s.l;
+    document.getElementById('c-pct').textContent    = s.pct + '%';
+    document.getElementById('c-total').textContent  = s.total + ' Picks Tracked';
+    document.getElementById('c-streak').textContent = s.streakStr;
+    if (s.hasU && s.totP !== null) {
+      const el = document.getElementById('c-units');
+      el.textContent = fmt(s.totP);
+      el.style.color = s.totP >= 0 ? '#22c55e' : '#ef4444';
+      document.getElementById('c-usub').textContent = 'At model unit sizing';
+    } else {
+      document.getElementById('c-units').textContent = 'Building...';
+      document.getElementById('c-usub').textContent  = 'Grows daily from here';
+    }
+    const tbody = document.getElementById('tbody');
+    let tw = 0, tp = 0, anyU = false;
+    picks.forEach(p => {
+      const tr = document.createElement('tr');
+      tr.className = p.result==='W' ? 'win-row' : 'loss-row';
+      const uC = p.units
+  ? p.units+'u'
+  : '<span style="color:rgba(167,173,181,0.25);font-size:10px">—</span>';
+      let pC='<span style="color:rgba(167,173,181,0.2);font-size:10px">—</span>', pS='';
+      if (p.profit !== null) {
+        anyU=true; tw+=(p.units||0); tp+=p.profit;
+        pC=fmt(p.profit); pS=p.profit>=0?'color:#22c55e':'color:#ef4444';
+      }
+      tr.innerHTML =
+        '<td class="td-date">'  +p.date+  '</td>'+
+        '<td class="td-pick">'  +p.pick+  '</td>'+
+        '<td class="td-result '+p.result.toLowerCase()+'">'+p.result+'</td>'+
+        '<td class="td-record" style="font-size:11px">'+uC+'</td>'+
+        '<td class="td-record" style="font-size:11px;'+pS+'">'+pC+'</td>'+
+        '<td class="td-record">'+(p.record||'—')+'</td>';
+      tbody.appendChild(tr);
+    });
+    if (anyU) {
+      document.getElementById('tf-w').textContent = tw.toFixed(1)+'u wagered';
+      const el = document.getElementById('tf-p');
+      el.textContent=fmt(tp); el.style.color=tp>=0?'#22c55e':'#ef4444';
+      document.getElementById('tfoot').style.display='';
+    }
+    document.getElementById('loading').style.display='none';
+    document.getElementById('tbl').style.display='table';
+  } catch(e) {
+    document.getElementById('loading').innerHTML='<span style="color:#ef4444">Could not load. Try refreshing.</span>';
+  }
+}
+init();
+</script>
+</body>
+</html>

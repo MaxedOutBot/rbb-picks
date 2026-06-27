@@ -1,0 +1,35 @@
+name: Post Picks to WHOP + Email Subscribers
+
+on:
+  push:
+    paths:
+      - 'picks.json'
+
+jobs:
+  deliver-picks:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: pip install requests
+
+      - name: Post to WHOP
+        env:
+          WHOP_API_KEY:    ${{ secrets.WHOP_API_KEY }}
+          WHOP_PRODUCT_ID: ${{ secrets.WHOP_PRODUCT_ID }}
+        run: python post_to_whop.py
+
+      - name: Email subscribers
+        env:
+          WHOP_API_KEY:    ${{ secrets.WHOP_API_KEY }}
+          WHOP_PRODUCT_ID: ${{ secrets.WHOP_PRODUCT_ID }}
+          RESEND_API_KEY:  ${{ secrets.RESEND_API_KEY }}
+          FROM_EMAIL:      ${{ secrets.FROM_EMAIL }}
+        run: python send_picks_email.py

@@ -1,0 +1,38 @@
+name: Manhattan Model Auto Picks
+
+on:
+  schedule:
+    - cron: '0 18 * * *'    # 11:00am PT — morning board scan
+    - cron: '59 21 * * *'   # 2:59pm PT  — main card release
+    - cron: '45 0 * * *'    # 5:45pm PT  — late game additions
+  workflow_dispatch:         # Manual trigger button in GitHub Actions
+
+jobs:
+  generate-picks:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: pip install requests
+
+      - name: Run Manhattan Model
+        env:
+          ODDS_API_KEY: ${{ secrets.ODDS_API_KEY }}
+        run: python picks_engine.py
+
+      - name: Notify Ric — picks ready for approval
+        env:
+          RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
+          RIC_EMAIL:      ${{ secrets.FROM_EMAIL }}
+          TWILIO_SID:     ${{ secrets.TWILIO_SID }}
+          TWILIO_TOKEN:   ${{ secrets.TWILIO_TOKEN }}
+          TWILIO_FROM:    ${{ secrets.TWILIO_FROM }}
+          RIC_PHONE:      ${{ secrets.RIC_PHONE }}
+        run: python notify_ric.py
