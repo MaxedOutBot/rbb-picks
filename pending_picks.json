@@ -1,30 +1,14 @@
 {
   "date": "2026-06-28",
-  "generated_at_pt": "June 28, 2026 12:05 PM PT",
-  "last_updated": "12:05 PM PT",
+  "generated_at_pt": "June 28, 2026 12:33 PM PT",
+  "last_updated": "12:33 PM PT",
   "sport": "MLB",
-  "total_released": 8,
+  "total_released": 7,
   "released_picks": [
     {
-      "game": "Arizona Diamondbacks @ Tampa Bay Rays",
-      "bet": "Tampa Bay Rays ML",
-      "odds": "-4000",
-      "stars": 5,
-      "units": 3.0,
-      "units_display": "3.0 Units",
-      "signals": [
-        "Sharp money analysis complete - model found value at current line",
-        "Confirm starters before placing bet"
-      ],
-      "market_score": 126,
-      "released": true,
-      "is_free": false,
-      "tag": "NO TAG"
-    },
-    {
-      "game": "Seattle Mariners @ Cleveland Guardians",
+      "game": "Los Angeles Angels @ Seattle Mariners",
       "bet": "Seattle Mariners ML",
-      "odds": "-950",
+      "odds": "-220",
       "stars": 5,
       "units": 3.0,
       "units_display": "3.0 Units",
@@ -32,103 +16,103 @@
         "Sharp money analysis complete - model found value at current line",
         "Confirm starters before placing bet"
       ],
-      "market_score": 105,
+      "market_score": 48,
       "released": true,
       "is_free": false,
       "tag": "NO TAG"
     },
     {
-      "game": "Houston Astros @ Detroit Tigers",
-      "bet": "Detroit Tigers ML",
-      "odds": "-590",
-      "stars": 5,
-      "units": 3.0,
-      "units_display": "3.0 Units",
+      "game": "Atlanta Braves @ San Francisco Giants",
+      "bet": "Atlanta Braves ML",
+      "odds": "-180",
+      "stars": 3,
+      "units": 1.5,
+      "units_display": "1.5 Units",
       "signals": [
         "Sharp money analysis complete - model found value at current line",
         "Confirm starters before placing bet"
       ],
-      "market_score": 92,
+      "market_score": 35,
       "released": true,
       "is_free": false,
       "tag": "NO TAG"
     },
     {
-      "game": "Washington Nationals @ Baltimore Orioles",
-      "bet": "Washington Nationals ML",
-      "odds": "-430",
-      "stars": 5,
-      "units": 3.0,
-      "units_display": "3.0 Units",
-      "signals": [
-        "Sharp money analysis complete - model found value at current line",
-        "Confirm starters before placing bet"
-      ],
-      "market_score": 79,
-      "released": true,
-      "is_free": false,
-      "tag": "NO TAG"
-    },
-    {
-      "game": "Miami Marlins @ St. Louis Cardinals",
-      "bet": "St. Louis Cardinals ML",
-      "odds": "-430",
-      "stars": 5,
-      "units": 3.0,
-      "units_display": "3.0 Units",
-      "signals": [
-        "Sharp money analysis complete - model found value at current line",
-        "Confirm starters before placing bet"
-      ],
-      "market_score": 79,
-      "released": true,
-      "is_free": false,
-      "tag": "NO TAG"
-    },
-    {
-      "game": "Chicago Cubs @ Milwaukee Brewers",
+      "game": "Cincinnati Reds @ Milwaukee Brewers",
       "bet": "Milwaukee Brewers ML",
-      "odds": "-350",
-      "stars": 5,
-      "units": 3.0,
-      "units_display": "3.0 Units",
+      "odds": "-152",
+      "stars": 2,
+      "units": 1.0,
+      "units_display": "1.0 Units",
       "signals": [
         "Sharp money analysis complete - model found value at current line",
         "Confirm starters before placing bet"
       ],
-      "market_score": 70,
+      "market_score": 23,
       "released": true,
       "is_free": false,
       "tag": "NO TAG"
     },
     {
-      "game": "Cincinnati Reds @ Pittsburgh Pirates",
-      "bet": "Pittsburgh Pirates ML",
-      "odds": "-330",
-      "stars": 5,
-      "units": 3.0,
-      "units_display": "3.0 Units",
+      "game": "Detroit Tigers @ New York Yankees",
+      "bet": "New York Yankees ML",
+      "odds": "-142",
+      "stars": 2,
+      "units": 1.0,
+      "units_display": "1.0 Units",
       "signals": [
         "Sharp money analysis complete - model found value at current line",
         "Confirm starters before placing bet"
       ],
-      "market_score": 66,
+      "market_score": 19,
       "released": true,
       "is_free": false,
       "tag": "NO TAG"
     },
     {
-      "game": "Philadelphia Phillies @ New York Mets",
-      "bet": "Philadelphia Phillies ML",
-      "odds": "-330",
-      "stars": 5,
-      "units": 3.0,
-      "units_display": "3.0 Units",
+      "game": "Los Angeles Dodgers @ San Diego Padres",
+      "bet": "Los Angeles Dodgers ML",
+      "odds": "-138",
+      "stars": 2,
+      "units": 1.0,
+      "units_display": "1.0 Units",
       "signals": [
         "Sharp money analysis complete - model found value at current line",
         "Confirm starters before placing bet"
       ],
-      "market_score": 66,
+      "market_score": 17,
+      "released": true,
+      "is_free": false,
+      "tag": "NO TAG"
+    },
+    {
+      "game": "Chicago White Sox @ Baltimore Orioles",
+      "bet": "Baltimore Orioles ML",
+      "odds": "-134",
+      "stars": 2,
+      "units": 1.0,
+      "units_display": "1.0 Units",
+      "signals": [
+        "Sharp money analysis complete - model found value at current line",
+        "Confirm starters before placing bet"
+      ],
+      "market_score": 15,
+      "released": true,
+      "is_free": false,
+      "tag": "NO TAG"
+    },
+    {
+      "game": "San Francisco Giants @ Arizona Diamondbacks",
+      "bet": "Arizona Diamondbacks ML",
+      "odds": "-134",
+      "stars": 2,
+      "units": 1.0,
+      "units_display": "1.0 Units",
+      "signals": [
+        "Sharp money analysis complete - model found value at current line",
+        "Confirm starters before placing bet"
+      ],
+      "market_score": 15,
       "released": true,
       "is_free": false,
       "tag": "NO TAG"
@@ -136,25 +120,9 @@
   ],
   "premium_picks": [
     {
-      "game": "Arizona Diamondbacks @ Tampa Bay Rays",
-      "bet": "Tampa Bay Rays ML",
-      "odds": "-4000",
-      "stars": 5,
-      "units": 3.0,
-      "units_display": "3.0 Units",
-      "signals": [
-        "Sharp money analysis complete - model found value at current line",
-        "Confirm starters before placing bet"
-      ],
-      "market_score": 126,
-      "released": true,
-      "is_free": false,
-      "tag": "NO TAG"
-    },
-    {
-      "game": "Seattle Mariners @ Cleveland Guardians",
+      "game": "Los Angeles Angels @ Seattle Mariners",
       "bet": "Seattle Mariners ML",
-      "odds": "-950",
+      "odds": "-220",
       "stars": 5,
       "units": 3.0,
       "units_display": "3.0 Units",
@@ -162,128 +130,128 @@
         "Sharp money analysis complete - model found value at current line",
         "Confirm starters before placing bet"
       ],
-      "market_score": 105,
+      "market_score": 48,
       "released": true,
       "is_free": false,
       "tag": "NO TAG"
     },
     {
-      "game": "Houston Astros @ Detroit Tigers",
-      "bet": "Detroit Tigers ML",
-      "odds": "-590",
-      "stars": 5,
-      "units": 3.0,
-      "units_display": "3.0 Units",
+      "game": "Atlanta Braves @ San Francisco Giants",
+      "bet": "Atlanta Braves ML",
+      "odds": "-180",
+      "stars": 3,
+      "units": 1.5,
+      "units_display": "1.5 Units",
       "signals": [
         "Sharp money analysis complete - model found value at current line",
         "Confirm starters before placing bet"
       ],
-      "market_score": 92,
+      "market_score": 35,
       "released": true,
       "is_free": false,
       "tag": "NO TAG"
     },
     {
-      "game": "Washington Nationals @ Baltimore Orioles",
-      "bet": "Washington Nationals ML",
-      "odds": "-430",
-      "stars": 5,
-      "units": 3.0,
-      "units_display": "3.0 Units",
-      "signals": [
-        "Sharp money analysis complete - model found value at current line",
-        "Confirm starters before placing bet"
-      ],
-      "market_score": 79,
-      "released": true,
-      "is_free": false,
-      "tag": "NO TAG"
-    },
-    {
-      "game": "Miami Marlins @ St. Louis Cardinals",
-      "bet": "St. Louis Cardinals ML",
-      "odds": "-430",
-      "stars": 5,
-      "units": 3.0,
-      "units_display": "3.0 Units",
-      "signals": [
-        "Sharp money analysis complete - model found value at current line",
-        "Confirm starters before placing bet"
-      ],
-      "market_score": 79,
-      "released": true,
-      "is_free": false,
-      "tag": "NO TAG"
-    },
-    {
-      "game": "Chicago Cubs @ Milwaukee Brewers",
+      "game": "Cincinnati Reds @ Milwaukee Brewers",
       "bet": "Milwaukee Brewers ML",
-      "odds": "-350",
-      "stars": 5,
-      "units": 3.0,
-      "units_display": "3.0 Units",
+      "odds": "-152",
+      "stars": 2,
+      "units": 1.0,
+      "units_display": "1.0 Units",
       "signals": [
         "Sharp money analysis complete - model found value at current line",
         "Confirm starters before placing bet"
       ],
-      "market_score": 70,
+      "market_score": 23,
       "released": true,
       "is_free": false,
       "tag": "NO TAG"
     },
     {
-      "game": "Cincinnati Reds @ Pittsburgh Pirates",
-      "bet": "Pittsburgh Pirates ML",
-      "odds": "-330",
-      "stars": 5,
-      "units": 3.0,
-      "units_display": "3.0 Units",
+      "game": "Detroit Tigers @ New York Yankees",
+      "bet": "New York Yankees ML",
+      "odds": "-142",
+      "stars": 2,
+      "units": 1.0,
+      "units_display": "1.0 Units",
       "signals": [
         "Sharp money analysis complete - model found value at current line",
         "Confirm starters before placing bet"
       ],
-      "market_score": 66,
+      "market_score": 19,
       "released": true,
       "is_free": false,
       "tag": "NO TAG"
     },
     {
-      "game": "Philadelphia Phillies @ New York Mets",
-      "bet": "Philadelphia Phillies ML",
-      "odds": "-330",
-      "stars": 5,
-      "units": 3.0,
-      "units_display": "3.0 Units",
+      "game": "Los Angeles Dodgers @ San Diego Padres",
+      "bet": "Los Angeles Dodgers ML",
+      "odds": "-138",
+      "stars": 2,
+      "units": 1.0,
+      "units_display": "1.0 Units",
       "signals": [
         "Sharp money analysis complete - model found value at current line",
         "Confirm starters before placing bet"
       ],
-      "market_score": 66,
+      "market_score": 17,
+      "released": true,
+      "is_free": false,
+      "tag": "NO TAG"
+    },
+    {
+      "game": "Chicago White Sox @ Baltimore Orioles",
+      "bet": "Baltimore Orioles ML",
+      "odds": "-134",
+      "stars": 2,
+      "units": 1.0,
+      "units_display": "1.0 Units",
+      "signals": [
+        "Sharp money analysis complete - model found value at current line",
+        "Confirm starters before placing bet"
+      ],
+      "market_score": 15,
+      "released": true,
+      "is_free": false,
+      "tag": "NO TAG"
+    },
+    {
+      "game": "San Francisco Giants @ Arizona Diamondbacks",
+      "bet": "Arizona Diamondbacks ML",
+      "odds": "-134",
+      "stars": 2,
+      "units": 1.0,
+      "units_display": "1.0 Units",
+      "signals": [
+        "Sharp money analysis complete - model found value at current line",
+        "Confirm starters before placing bet"
+      ],
+      "market_score": 15,
       "released": true,
       "is_free": false,
       "tag": "NO TAG"
     }
   ],
   "free_pick": {
-    "game": "Philadelphia Phillies @ New York Mets",
-    "bet": "Philadelphia Phillies ML",
-    "odds": "-330",
-    "stars": 5,
-    "units": 3.0,
-    "units_display": "3.0 Units",
+    "game": "San Francisco Giants @ Arizona Diamondbacks",
+    "bet": "Arizona Diamondbacks ML",
+    "odds": "-134",
+    "stars": 2,
+    "units": 1.0,
+    "units_display": "1.0 Units",
     "signals": [
       "Sharp money analysis complete - model found value at current line",
       "Confirm starters before placing bet"
     ],
-    "market_score": 66,
+    "market_score": 15,
     "released": true,
     "is_free": true,
     "tag": "NO TAG"
   },
   "best_play": {
-    "game": "Arizona Diamondbacks @ Tampa Bay Rays",
-    "bet": "Tampa Bay Rays ML",
-    "odds": "-4000",
+    "game": "Los Angeles Angels @ Seattle Mariners",
+    "bet": "Seattle Mariners ML",
+    "odds": "-220",
     "stars": 5,
     "units": 3.0,
     "units_display": "3.0 Units",
@@ -291,7 +259,7 @@
       "Sharp money analysis complete - model found value at current line",
       "Confirm starters before placing bet"
     ],
-    "market_score": 126,
+    "market_score": 48,
     "released": true,
     "is_free": false,
     "tag": "NO TAG"
