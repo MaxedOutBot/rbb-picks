@@ -2,9 +2,11 @@ name: Manhattan Model Auto Picks
 
 on:
   schedule:
-    - cron: '0 18 * * *'    # 11:00am PT — morning board scan
-    - cron: '59 21 * * *'   # 2:59pm PT  — main card release
-    - cron: '45 0 * * *'    # 5:45pm PT  — late game additions
+    - cron: '0 18 * * *'    # 11:00am PT — all days
+    - cron: '59 21 * * *'   # 2:59pm PT  — all days
+    - cron: '45 0 * * *'    # 5:45pm PT  — all days
+    - cron: '0 16 * * 6,0'  # 9:00am PT  — Sat & Sun only
+    - cron: '0 20 * * 6,0'  # 1:00pm PT  — Sat & Sun only
   workflow_dispatch:
 
 jobs:
