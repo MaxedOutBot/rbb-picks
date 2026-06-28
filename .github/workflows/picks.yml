@@ -38,3 +38,10 @@ jobs:
           TWILIO_FROM:    ${{ secrets.TWILIO_FROM }}
           RIC_PHONE:      ${{ secrets.RIC_PHONE }}
         run: python notify_ric.py
+
+      - name: Keep repo active
+        run: |
+          git config user.name "MaxedOutBot"
+          git config user.email "bot@ricsbestbets.com"
+          git commit --allow-empty -m "Scheduled run $(date -u +%Y-%m-%d)"
+          git push
