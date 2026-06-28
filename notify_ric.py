@@ -13,7 +13,7 @@ if KEY and EMAIL:
     t=data.get("last_updated","now")
     requests.post("https://api.resend.com/emails",
         headers={"Authorization":f"Bearer {KEY}","Content-Type":"application/json"},
-        json={"from":f"RBB <{EMAIL}>","to":[EMAIL],
+        json={"from":"RBB System <onboarding@resend.dev>","to":[EMAIL],
               "subject":f"🔥 {n} Picks Ready — {t} | ricsbestbets.com/admin",
               "text":f"{n} picks ready at {t}.\n\nApprove at ricsbestbets.com/admin"},
         timeout=10)
