@@ -31,7 +31,7 @@ SELF-LEARNING:
   - All state saved to model_state.json — accumulates forever
 """
 
-import json, os, random, math, requests
+import json, os, random, math, requests, sys, traceback
 from datetime import date, datetime, timezone, timedelta
 
 KEY       = os.environ.get("ODDS_API_KEY","")
@@ -145,6 +145,17 @@ SPORT_LABELS = {
     "soccer_uefa_champs_league":"Champions League","soccer_spain_la_liga":"La Liga",
 }
 
+def json_safe(v):
+    """Recursively convert any Python object to JSON-serializable types."""
+    if isinstance(v, set):   return sorted(list(v))  # sets → sorted list
+    if isinstance(v, dict):  return {str(k):json_safe(vv) for k,vv in v.items()}
+    if isinstance(v, list):  return [json_safe(i) for i in v]
+    if isinstance(v, tuple): return [json_safe(i) for i in v]
+    if isinstance(v, float):
+        if v != v or v == float('inf') or v == float('-inf'): return None  # NaN/Inf → null
+        return v
+    return v
+
 # ════════════════════════════════════════════════════════════
 # SECTION 2 — SELF-LEARNING STATE
 # ════════════════════════════════════════════════════════════
@@ -174,13 +185,7 @@ def load_state():
 
 def save_state(s):
     s["last_updated"]=TODAY_STR
-    def json_safe(v):
-        if isinstance(v,set): return list(v)
-        if isinstance(v,dict): return {k:json_safe(vv) for k,vv in v.items()}
-        if isinstance(v,list): return [json_safe(i) for i in v]
-        if isinstance(v,tuple): return list(v)
-        return v
-    out={k:json_safe(v) for k,v in s.items()}
+    out=json_safe(s)   # module-level json_safe handles sets, tuples, NaN, etc.
     with open("model_state.json","w") as f: json.dump(out,f,indent=2)
 
 def get_pss_mult(state, code):
@@ -1175,60 +1180,118 @@ def main():
         except Exception as e: print(f"[V11] Skip: {e}")
 
     # Deduplicate + rank by PSS
-    seen,unique=set(),[]
-    for p in sorted(all_picks,key=lambda x:x["market_score"],reverse=True):
-        key=p["game"]+"|"+p["bet"]
-        if key not in seen: seen.add(key); unique.append(p)
-    picks=unique[:8]
+    # Key rule: one total pick per game max (Over OR Under, whichever scored higher)
+    # Also: one ML/spread pick per game max
+    seen_game_total = set()   # game → total already picked
+    seen_game_ml    = set()   # game → ML/spread already picked
+    seen_exact      = set()   # exact game+bet dedupe
+    unique = []
+    for p in sorted(all_picks, key=lambda x:x["market_score"], reverse=True):
+        exact_key = p["game"]+"|"+p["bet"]
+        if exact_key in seen_exact: continue
+        seen_exact.add(exact_key)
+        bt = p.get("bet_type","ML")
+        game_key = p["game"]
+        if bt in ("OVER","UNDER"):
+            if game_key in seen_game_total: continue  # already have a total for this game
+            seen_game_total.add(game_key)
+        else:
+            if game_key in seen_game_ml: continue    # already have ML/spread for this game
+            seen_game_ml.add(game_key)
+        unique.append(p)
+    # V11 rule: 3-5 picks, never 8-11
+    picks = unique[:5]
 
-    print(f"[V11] {len(all_picks)} candidates → {len(picks)} released")
+    print(f"[V11] {len(all_picks)} candidates → {len(picks)} released (max 5)")
     for p in picks:
-        print(f"  {p['sport']}: {p['bet']} {p['odds']} | PSS:{p['pss']} EV:{p['ev_pct']}% {p['stars']}★ | {','.join(p['signals_fired'][:3])}")
+        stars_str = str(p['stars']) + "*"
+        signals_str = ",".join(p.get("signals_fired",["?"])[:3])
+        game_str = p.get("game","?")
+        print(f"  [{p['sport']}] {game_str} | {p['bet']} {p['odds']} | PSS:{p['pss']} EV:{p['ev_pct']}% {stars_str} | {signals_str}")
+    sys.stdout.flush()
 
-    # ── Build and save output ─────────────────────────────────
-    fp=dict(picks[-1]) if picks else None
-    if fp: fp["is_free"]=True
+    # ── Build and save output (every dump wrapped with explicit error trapping) ──
     try:
         from zoneinfo import ZoneInfo
-        now_pt=datetime.now(ZoneInfo("America/Los_Angeles"))
-    except: now_pt=datetime.now(timezone.utc)
+        now_pt = datetime.now(ZoneInfo("America/Los_Angeles"))
+    except Exception:
+        now_pt = datetime.now(timezone.utc)
 
-    cal=state.get("calibration",{})
-    sa=state.get("signal_accuracy",{})
-    top_signals=sorted([(c,s["acc"],s.get("fires",0)) for c,s in sa.items()
-                         if s.get("fires",0)>=8],key=lambda x:x[1],reverse=True)[:6]
+    cal = state.get("calibration", {})
+    sa  = state.get("signal_accuracy", {})
 
-    out={"date":TODAY_STR,"generated_at_pt":now_pt.strftime("%B %d, %Y %I:%M %p PT"),
-         "last_updated":now_pt.strftime("%I:%M %p PT"),
-         "model":"Manhattan Model V11 — Ultimate Self-Learning",
-         "sports_checked":list(sport_counts.keys()),
-         "total_games":len(all_games),"total_released":len(picks),
-         "released_picks":picks,"premium_picks":picks,"free_pick":fp,
-         "best_play":picks[0] if picks else None,
-         "model_intelligence":{
-             "total_graded":state.get("total_graded",0),
-             "brier_score":cal.get("brier_30"),
-             "win_rate_30d":cal.get("win_rate_30"),
-             "probability_bias":cal.get("probability_bias",0),
-             "top_signals":top_signals,
-             "bet_type_accuracy":state.get("bet_type_accuracy",{}),
-         }}
-    with open("pending_picks.json","w") as f: json.dump(out,f,indent=2)
+    # top_signals as plain lists (never tuples — tuples cause JSON issues on some Pythons)
+    top_signals = [[c, round(s.get("acc",0),3), s.get("fires",0)]
+                   for c,s in sorted(sa.items(), key=lambda x: x[1].get("acc",0), reverse=True)
+                   if s.get("fires",0) >= 8][:6]
 
-    # Save all picks to log for future grading
-    try: ld=json.load(open("picks_log.json"))
-    except: ld={}
-    if isinstance(ld,list): ld={"picks":ld}
-    existing=ld.get("picks",[]); existing_keys={p["game"]+"|"+p["bet"]+"|"+p.get("date","") for p in existing}
-    for p in picks:
-        key=p["game"]+"|"+p["bet"]+"|"+TODAY_STR
-        if key not in existing_keys: p["date"]=TODAY_STR; existing.append(p)
-    ld["picks"]=existing[-500:]
-    with open("picks_log.json","w") as f: json.dump(ld,f,indent=2)
+    fp = json_safe(dict(picks[-1])) if picks else None
+    if fp: fp["is_free"] = True
 
-    # Save evolved model state
-    save_state(state)
-    print(f"[V11] Done — model state saved | {len(picks)} picks ready")
+    # Run EVERYTHING through json_safe before any json.dump
+    out = json_safe({
+        "date":            TODAY_STR,
+        "generated_at_pt": now_pt.strftime("%B %d, %Y %I:%M %p PT"),
+        "last_updated":    now_pt.strftime("%I:%M %p PT"),
+        "model":           "Manhattan Model V11 -- Ultimate Self-Learning",
+        "sports_checked":  list(sport_counts.keys()),
+        "total_games":     len(all_games),
+        "total_released":  len(picks),
+        "released_picks":  picks,
+        "premium_picks":   picks,
+        "free_pick":       fp,
+        "best_play":       picks[0] if picks else None,
+        "model_intelligence": {
+            "total_graded":    state.get("total_graded", 0),
+            "brier_score":     cal.get("brier_30"),
+            "win_rate_30d":    cal.get("win_rate_30"),
+            "probability_bias":cal.get("probability_bias", 0),
+            "top_signals":     top_signals,
+            "bet_type_accuracy": state.get("bet_type_accuracy", {}),
+        }
+    })
+
+    # Save pending_picks.json
+    try:
+        with open("pending_picks.json", "w") as f:
+            json.dump(out, f, indent=2)
+        print("[V11] pending_picks.json SAVED")
+    except Exception:
+        print("[V11] ERROR saving pending_picks.json:")
+        traceback.print_exc(file=sys.stdout)
+
+    # Save picks_log.json
+    try:
+        try:   raw = json.load(open("picks_log.json"))
+        except Exception: raw = {}
+        if isinstance(raw, list): raw = {"picks": raw}
+        existing     = raw.get("picks", [])
+        existing_keys = {str(p.get("game",""))+"|"+str(p.get("bet",""))+"|"+str(p.get("date",""))
+                         for p in existing}
+        for p in picks:
+            key = str(p.get("game",""))+"|"+str(p.get("bet",""))+"|"+TODAY_STR
+            if key not in existing_keys:
+                safe_p = json_safe(dict(p))
+                safe_p["date"] = TODAY_STR
+                existing.append(safe_p)
+        raw["picks"] = existing[-500:]
+        with open("picks_log.json", "w") as f:
+            json.dump(raw, f, indent=2)
+        print("[V11] picks_log.json SAVED")
+    except Exception:
+        print("[V11] ERROR saving picks_log.json:")
+        traceback.print_exc(file=sys.stdout)
+
+    # Save model_state.json
+    try:
+        save_state(state)
+        print(f"[V11] model_state.json SAVED | {len(picks)} picks ready")
+    except Exception:
+        print("[V11] ERROR saving model_state.json:")
+        traceback.print_exc(file=sys.stdout)
+
+    sys.stdout.flush()
+    print("[V11] Complete.")
 
 if __name__=="__main__":
     main()
