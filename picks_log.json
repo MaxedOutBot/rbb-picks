@@ -1,9 +1,205 @@
-[
-  {
-    "date": "2026-06-28",
-    "bet": "Philadelphia Phillies ML",
-    "odds": "-330",
-    "stars": 5,
-    "units": 3.0
-  }
-]
+{
+  "picks": [
+    {
+      "date": "2026-06-28",
+      "bet": "Philadelphia Phillies ML",
+      "odds": "-330",
+      "stars": 5,
+      "units": 3.0
+    },
+    {
+      "game": "Washington Nationals @ Boston Red Sox",
+      "sport": "MLB",
+      "sport_key": "baseball_mlb",
+      "bet": "Under 9.0",
+      "bet_type": "UNDER",
+      "odds": "-115",
+      "total_line": 9.0,
+      "stars": 4,
+      "units": 1.0,
+      "units_display": "1.0 Unit",
+      "signals": [
+        "System 1 Under: de-vig 78.0% | 2v2 book split | PSS 116",
+        "J-120/UNDER-G1: Series G1 \u2192 Under (70%, both aces fresh)",
+        "UND-1/G1: Heavy fav -188 + G1 \u2192 Strong Under"
+      ],
+      "signals_fired": [
+        "G1_UNDER",
+        "HEAVY_FAV_UNDER_G1",
+        "HIGH_EV_TOTAL"
+      ],
+      "pss": 116,
+      "ev_pct": 45.77,
+      "true_prob": 77.97,
+      "sim_pct": 78.09,
+      "ci_range": 0.5,
+      "series_game": 1,
+      "series_desc": "G1",
+      "home_era": null,
+      "away_era": null,
+      "market_score": 116,
+      "released": true,
+      "is_free": false,
+      "tag": "NO TAG",
+      "result": null,
+      "graded_at": null,
+      "date": "2026-06-28"
+    },
+    {
+      "game": "Los Angeles Angels @ Seattle Mariners",
+      "sport": "MLB",
+      "sport_key": "baseball_mlb",
+      "bet": "Under 7.6",
+      "bet_type": "UNDER",
+      "odds": "104",
+      "total_line": 7.6,
+      "stars": 4,
+      "units": 1.0,
+      "units_display": "1.0 Unit",
+      "signals": [
+        "System 1 Under: de-vig 63.0% | 8v3 book split | PSS 84",
+        "Pitcher's park (Seattle Mariners, PF=0.93) \u2014 Under lean",
+        "J-120/UNDER-G1: Series G1 \u2192 Under (70%, both aces fresh)"
+      ],
+      "signals_fired": [
+        "PITCHER_PARK_UNDER",
+        "G1_UNDER",
+        "HEAVY_FAV_UNDER_G1",
+        "BOOKS_3_UNDER",
+        "HIGH_EV_TOTAL"
+      ],
+      "pss": 84,
+      "ev_pct": 28.52,
+      "true_prob": 63.0,
+      "sim_pct": 63.13,
+      "ci_range": 0.6,
+      "series_game": 1,
+      "series_desc": "G1",
+      "home_era": null,
+      "away_era": null,
+      "market_score": 84,
+      "released": true,
+      "is_free": false,
+      "tag": "NO TAG",
+      "result": null,
+      "graded_at": null,
+      "date": "2026-06-28"
+    },
+    {
+      "game": "New York Mets @ Toronto Blue Jays",
+      "sport": "MLB",
+      "sport_key": "baseball_mlb",
+      "bet": "Under 8.5",
+      "bet_type": "UNDER",
+      "odds": "-109",
+      "total_line": 8.5,
+      "stars": 4,
+      "units": 1.0,
+      "units_display": "1.0 Unit",
+      "signals": [
+        "System 1 Under: de-vig 65.0% | 9v9 book split | PSS 78",
+        "Pitcher's park (Toronto Blue Jays, PF=0.95) \u2014 Under lean",
+        "J-120/UNDER-G1: Series G1 \u2192 Under (70%, both aces fresh)"
+      ],
+      "signals_fired": [
+        "PITCHER_PARK_UNDER",
+        "G1_UNDER",
+        "BOOKS_5_UNDER",
+        "HIGH_EV_TOTAL"
+      ],
+      "pss": 78,
+      "ev_pct": 24.63,
+      "true_prob": 65.0,
+      "sim_pct": 65.32,
+      "ci_range": 0.6,
+      "series_game": 1,
+      "series_desc": "G1",
+      "home_era": null,
+      "away_era": null,
+      "market_score": 78,
+      "released": true,
+      "is_free": false,
+      "tag": "NO TAG",
+      "result": null,
+      "graded_at": null,
+      "date": "2026-06-28"
+    },
+    {
+      "game": "San Francisco Giants @ Arizona Diamondbacks",
+      "sport": "MLB",
+      "sport_key": "baseball_mlb",
+      "bet": "Under 8.6",
+      "bet_type": "UNDER",
+      "odds": "-105",
+      "total_line": 8.6,
+      "stars": 4,
+      "units": 1.0,
+      "units_display": "1.0 Unit",
+      "signals": [
+        "System 1 Under: de-vig 65.0% | 8v7 book split | PSS 78",
+        "Pitcher's park (Arizona Diamondbacks, PF=0.95) \u2014 Under lean",
+        "J-120/UNDER-G1: Series G1 \u2192 Under (70%, both aces fresh)"
+      ],
+      "signals_fired": [
+        "PITCHER_PARK_UNDER",
+        "G1_UNDER",
+        "BOOKS_5_UNDER",
+        "HIGH_EV_TOTAL"
+      ],
+      "pss": 78,
+      "ev_pct": 26.9,
+      "true_prob": 65.0,
+      "sim_pct": 64.96,
+      "ci_range": 0.6,
+      "series_game": 1,
+      "series_desc": "G1",
+      "home_era": null,
+      "away_era": null,
+      "market_score": 78,
+      "released": true,
+      "is_free": false,
+      "tag": "NO TAG",
+      "result": null,
+      "graded_at": null,
+      "date": "2026-06-28"
+    },
+    {
+      "game": "Chicago White Sox @ Baltimore Orioles",
+      "sport": "MLB",
+      "sport_key": "baseball_mlb",
+      "bet": "Under 9.0",
+      "bet_type": "UNDER",
+      "odds": "-113",
+      "total_line": 9.0,
+      "stars": 4,
+      "units": 1.0,
+      "units_display": "1.0 Unit",
+      "signals": [
+        "System 1 Under: de-vig 65.0% | 9v9 book split | PSS 73",
+        "J-120/UNDER-G1: Series G1 \u2192 Under (70%, both aces fresh)",
+        "9 of 18 books have Under juice"
+      ],
+      "signals_fired": [
+        "G1_UNDER",
+        "BOOKS_5_UNDER",
+        "HIGH_EV_TOTAL"
+      ],
+      "pss": 73,
+      "ev_pct": 22.52,
+      "true_prob": 65.0,
+      "sim_pct": 64.85,
+      "ci_range": 0.6,
+      "series_game": 1,
+      "series_desc": "G1",
+      "home_era": null,
+      "away_era": null,
+      "market_score": 73,
+      "released": true,
+      "is_free": false,
+      "tag": "NO TAG",
+      "result": null,
+      "graded_at": null,
+      "date": "2026-06-28"
+    }
+  ]
+}
