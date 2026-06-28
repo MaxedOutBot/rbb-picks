@@ -53,6 +53,7 @@ PSS_MIN_NRFI   = 22
 STARS_TO_UNITS = {5:3.0,4:2.0,3:1.5,2:1.0,1:0.5}
 
 ELITE_LINEUPS = ["Los Angeles Dodgers","New York Yankees","Houston Astros"]
+COORS_HOME    = "Colorado Rockies"   # J-75: always exempt from Under gates
 
 # All 30 MLB park factors (run-adjusted vs league average 1.00)
 # Source: Baseball Reference park factors, 3-year rolling average
@@ -173,7 +174,13 @@ def load_state():
 
 def save_state(s):
     s["last_updated"]=TODAY_STR
-    out = {k:(list(v) if isinstance(v,set) else v) for k,v in s.items()}
+    def json_safe(v):
+        if isinstance(v,set): return list(v)
+        if isinstance(v,dict): return {k:json_safe(vv) for k,vv in v.items()}
+        if isinstance(v,list): return [json_safe(i) for i in v]
+        if isinstance(v,tuple): return list(v)
+        return v
+    out={k:json_safe(v) for k,v in s.items()}
     with open("model_state.json","w") as f: json.dump(out,f,indent=2)
 
 def get_pss_mult(state, code):
@@ -450,7 +457,10 @@ def p2a(p):
 def devig(p1,p2): t=p1+p2; return p1/t,p2/t
 
 def calc_ev(wp,odds):
-    n=float(odds); d=(abs(n)/100+1) if n<0 else (n/100+1); return wp*d-1
+    """EV% = (true_win_prob × decimal_odds) − 1  [V11 Operative Rules]
+    Negative odds (fav): decimal = 1 + 100/abs(n)  e.g. -140 → 1.714
+    Positive odds (dog): decimal = 1 + n/100        e.g. +150 → 2.500"""
+    n=float(odds); d=(100/abs(n)+1) if n<0 else (n/100+1); return wp*d-1
 
 def monte_carlo(wp,n=MONTE_CARLO_N):
     w=sum(1 for _ in range(n) if random.random()<wp)
@@ -554,11 +564,12 @@ def grade_pick(pick, completed_scores):
     return None
 
 def run_learning_cycle(state, all_sport_scores):
+    ld={"picks":[]}   # default — overwritten if file exists
     try:
         ld=json.load(open("picks_log.json"))
         if isinstance(ld,list): ld={"picks":ld}
-        all_picks=ld.get("picks",[])
-    except: all_picks=[]
+    except: pass
+    all_picks=ld.get("picks",[])
 
     ungraded=[p for p in all_picks if p.get("result") is None]
     if not ungraded: print("[LEARN] No ungraded picks."); return all_picks
@@ -710,7 +721,12 @@ def analyze_game(game, state, ctx):
         for team,tp,odds,n_bk,opp_team in [
             (home,h_true,ho,hn,away),(away,a_true,ao,an,home)
         ]:
-            if float(odds)<MAX_ODDS_ML or tp<0.55: continue
+            # Hard caps: nothing worse than -185, nothing below 40% true prob
+            if float(odds)<MAX_ODDS_ML: continue
+            if tp<0.40: continue            # absolute floor for any bet
+            # Favorites: must show strong edge (55%+)
+            # Dogs: EV gate below is the natural filter — they need good odds to pass
+            if 0.50<tp<0.55: continue      # borderline favs rarely have real edge
             ev=calc_ev(tp,odds)
             if ev<MIN_EV: continue
             sc=["ML_EDGE"]; pss=min(20,int((tp-0.55)*300))
@@ -1010,11 +1026,13 @@ def analyze_game(game, state, ctx):
                 elif pitcher_gate=="half_unit_over" and not g2_waiver:
                     half_u=True; pss-=4; sc.append("PITCHER_GATE_HALF")
                     sigs.append(f"J-116: Both ERA<3.5 — half unit ceiling")
-                elif pitcher_gate=="one_ace" and direction=="Under":
-                    pss+=6; sc.append("ONE_ACE_UNDER")
+                # (one_ace_under is handled in the Under direction block below)
             if is_mlb and direction=="Under" and pitcher_gate=="cancel_over":
                 pss+=12; sc.append("PITCHER_GATE_CANCEL")
                 sigs.append(f"J-116: Elite matchup both ERA<3.0 — Under confirmed")
+            if is_mlb and direction=="Under" and pitcher_gate=="one_ace":
+                # One elite starter (ERA<3.0) — moderate Under lean
+                pss+=6; sc.append("ONE_ACE_UNDER")
 
             # Environment monthly calibration
             env=state.get("environment",{}).get(sport,{}).get(TODAY_STR[:7],{})
@@ -1028,6 +1046,40 @@ def analyze_game(game, state, ctx):
                         pss-=5  # total set below monthly avg = Under is tough
 
             if skip: continue
+
+            # ── Signal-driven probability adjustments ────────────────
+            # Signals are empirically validated edges. Boost probability
+            # so EV reflects the true historical edge, not just market price.
+            # Without this, signals only add PSS but EV stays market-implied
+            # and most total picks fail the EV gate even when signals fire.
+            if direction=="Over":
+                if "G2_OVER"        in sc: tp=min(0.72,tp+0.12)  # 90% historical
+                elif "G2PLUS_OVER"  in sc: tp=min(0.68,tp+0.08)  # 71% G3+
+                if "UMP_OVER"       in sc: tp=min(0.75,tp+0.14)  # Moscoso/Wegner
+                if "COORS_OVER"     in sc: tp=min(0.75,tp+0.10)  # Park factor
+                if "ATH_OVER"       in sc: tp=min(0.72,tp+0.08)
+                if "WIND_OUT_OVER"  in sc: tp=min(0.70,tp+0.08)
+                if "POST_EXTRAS_OVER" in sc: tp=min(0.70,tp+0.07)
+                if "J110_G2PLUS_OVER" in sc: tp=min(0.72,tp+0.09)
+                if "HITTER_PARK_OVER" in sc: tp=min(0.65,tp+0.05)
+                if "BOOKS_5_OVER"   in sc: tp=min(0.65,tp+0.05)
+                if "BOOKS_3_OVER"   in sc: tp=min(0.63,tp+0.03)
+            elif direction=="Under":
+                if "G1_UNDER"          in sc: tp=min(0.72,tp+0.12)  # 70% G1
+                if "UMP_UNDER"         in sc: tp=min(0.75,tp+0.14)
+                if "HEAVY_FAV_UNDER_G1" in sc: tp=min(0.80,tp+0.15)  # 100% sample
+                if "HEAVY_FAV_UNDER"   in sc: tp=min(0.72,tp+0.10)
+                if "PITCHER_GATE_CANCEL" in sc: tp=min(0.78,tp+0.12)
+                if "WIND_IN_UNDER"     in sc: tp=min(0.70,tp+0.08)
+                if "NFL_WIND_UNDER"    in sc: tp=min(0.72,tp+0.10)
+                if "NFL_COLD_UNDER"    in sc: tp=min(0.70,tp+0.08)
+                if "PITCHER_PARK_UNDER" in sc: tp=min(0.65,tp+0.05)
+                if "BOOKS_5_UNDER"     in sc: tp=min(0.65,tp+0.05)
+                if "BOOKS_3_UNDER"     in sc: tp=min(0.63,tp+0.03)
+                if "OVER_POSITIVE_ODDS" in sc: tp=min(0.68,tp+0.07)
+                if "COLD_UNDER"        in sc: tp=min(0.65,tp+0.05)
+            # Cap: never go above 0.85 (no certain bets)
+            tp=min(0.85,max(0.50,tp))
 
             # Base edge + EV
             pss+=max(0,int((tp-0.50)*300))
