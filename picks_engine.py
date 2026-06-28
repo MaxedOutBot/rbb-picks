@@ -7,19 +7,38 @@ STARS_TO_UNITS = {5:3.0,4:2.0,3:1.5,2:1.0,1:0.5}
 def fetch():
     if not KEY: return []
     url = "https://api.the-odds-api.com/v4/sports/baseball_mlb/odds/"
-    p = {"apiKey":KEY,"regions":"us","markets":"h2h,totals","oddsFormat":"american"}
+    p = {"apiKey":KEY,"regions":"us","markets":"h2h,totals",
+         "oddsFormat":"american","dateFormat":"iso"}
     try:
         r = requests.get(url,params=p,timeout=15)
-        return r.json() if r.ok else []
+        if not r.ok: return []
+        games = r.json()
+        # Only return games that haven't started yet
+        now = datetime.now(timezone.utc)
+        upcoming = []
+        for g in games:
+            ct = g.get("commence_time",")
+            if ct:
+                try:
+                    from datetime import datetime as dt2
+                    game_time = dt2.fromisoformat(ct.replace("Z","+00:00"))
+                    if game_time > now:
+                        upcoming.append(g)
+                except:
+                    upcoming.append(g)
+            else:
+                upcoming.append(g)
+        return upcoming
     except: return []
+
 
 def prob(o):
     n=float(o)
     return abs(n)/(abs(n)+100) if n<0 else 100/(n+100)
 
 def pick(g):
-    home=g.get("home_team","")
-    away=g.get("away_team","")
+    home=g.get("home_team",")
+    away=g.get("away_team",")
     bk=next((b for b in g.get("bookmakers",[]) if b["key"] in ["draftkings","fanduel"]),None)
     if not bk: return None
     ml=next((m for m in bk.get("markets",[]) if m["key"]=="h2h"),None)
@@ -40,6 +59,7 @@ def pick(g):
             "units":units,"units_display":str(units)+" Units","signals":sig,
             "market_score":int((sp-0.5)*300),"released":True,"is_free":False,
             "tag":"NO TAG"}
+
 
 games=fetch()
 picks=[x for x in (pick(g) for g in games) if x]
