@@ -428,6 +428,51 @@
       "result": null,
       "graded_at": null,
       "date": "2026-06-29"
+    },
+    {
+      "game": "New York Mets @ Toronto Blue Jays",
+      "sport": "MLB",
+      "sport_key": "baseball_mlb",
+      "bet": "Under 8.5",
+      "bet_type": "UNDER",
+      "odds": "-109",
+      "total_line": 8.5,
+      "stars": 4,
+      "units": 1.0,
+      "units_display": "1.0 Unit",
+      "signals": [
+        "System 1 Under: logit-scaled 67.7% | 9v9 | PSS 88",
+        "J-120/UNDER-G1: Series G1 Under (70%)",
+        "9v9 books on Under"
+      ],
+      "signals_fired": [
+        "PITCHER_PARK_UNDER",
+        "G1_UNDER",
+        "BOOKS_5_UNDER",
+        "HIGH_EV_TOTAL"
+      ],
+      "pss": 88,
+      "ev_pct": 29.81,
+      "true_prob": 67.7,
+      "sim_pct": 68.32,
+      "ci_range": 1.8,
+      "series_game": 1,
+      "series_desc": "G1",
+      "home_era": 3.56,
+      "away_era": 4.87,
+      "home_xfip": 3.56,
+      "home_xfip_metric": "ERA",
+      "away_xfip": 4.87,
+      "away_xfip_metric": "ERA",
+      "opening_odds": -127,
+      "clv_close": null,
+      "market_score": 88,
+      "released": true,
+      "is_free": false,
+      "tag": "NO TAG",
+      "result": null,
+      "graded_at": null,
+      "date": "2026-06-29"
     }
   ]
 }
