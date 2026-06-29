@@ -1,0 +1,17 @@
+{
+  "version": "V12.1",
+  "last_updated": "2026-06-29",
+  "total_graded": 0,
+  "signal_accuracy": {},
+  "sport_accuracy": {},
+  "bet_type_accuracy": {},
+  "calibration": {
+    "probability_bias": 0.0,
+    "brier_samples": [],
+    "brier_30": null,
+    "win_rate_30": null
+  },
+  "environment": {},
+  "yesterday_teams": [],
+  "clv_log": []
+}

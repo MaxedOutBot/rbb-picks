@@ -1,0 +1,69 @@
+{
+  "2026-06-29": {
+    "Baltimore Orioles|Chicago White Sox": {
+      "total": 9.3,
+      "over_odds": -114,
+      "home_ml": -136
+    },
+    "Philadelphia Phillies|Pittsburgh Pirates": {
+      "total": 8.7,
+      "over_odds": -118,
+      "home_ml": -110
+    },
+    "New York Yankees|Detroit Tigers": {
+      "total": 7.9,
+      "over_odds": -109,
+      "home_ml": -134
+    },
+    "Toronto Blue Jays|New York Mets": {
+      "total": 8.6,
+      "over_odds": -118,
+      "home_ml": -126
+    },
+    "Boston Red Sox|Washington Nationals": {
+      "total": 8.5,
+      "over_odds": -110,
+      "home_ml": -173
+    },
+    "Cleveland Guardians|Texas Rangers": {
+      "total": 7.5,
+      "over_odds": -116,
+      "home_ml": -148
+    },
+    "Milwaukee Brewers|Cincinnati Reds": {
+      "total": 9.0,
+      "over_odds": -106,
+      "home_ml": -137
+    },
+    "Chicago Cubs|San Diego Padres": {
+      "total": 11.0,
+      "over_odds": -117,
+      "home_ml": -154
+    },
+    "Houston Astros|Minnesota Twins": {
+      "total": 9.0,
+      "over_odds": -109,
+      "home_ml": -137
+    },
+    "Colorado Rockies|Miami Marlins": {
+      "total": 11.5,
+      "over_odds": -116,
+      "home_ml": 120
+    },
+    "Arizona Diamondbacks|San Francisco Giants": {
+      "total": 9.0,
+      "over_odds": -114,
+      "home_ml": -136
+    },
+    "Athletics|Los Angeles Dodgers": {
+      "total": 10.5,
+      "over_odds": -114,
+      "home_ml": -104
+    },
+    "Seattle Mariners|Los Angeles Angels": {
+      "total": 7.6,
+      "over_odds": -115,
+      "home_ml": -205
+    }
+  }
+}
