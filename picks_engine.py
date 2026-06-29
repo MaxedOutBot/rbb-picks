@@ -224,6 +224,7 @@ def power_devig(p1_imp, p2_imp):
     """
     if p1_imp <= 0 or p2_imp <= 0:
         t = p1_imp + p2_imp
+        if t == 0: return 0.5, 0.5
         return p1_imp/t, p2_imp/t
     # Binary search for k
     lo, hi = 0.3, 3.0
@@ -359,8 +360,12 @@ def load_state():
 
 def save_state(s):
     s["last_updated"]=TODAY_STR
-    with open("model_state.json","w") as f:
-        json.dump(json_safe(s), f, indent=2)
+    try:
+        with open("model_state.json","w") as f:
+            json.dump(json_safe(s), f, indent=2)
+    except Exception:
+        print("[V12] ERROR in save_state:")
+        traceback.print_exc(file=sys.stdout)
 
 def get_pss_mult(state, code):
     """
@@ -852,7 +857,11 @@ def run_learning_cycle(state, all_sport_scores):
         for code,acc,n in top:
             print(f"  {code}: {acc:.0%}* (n={n}) x{get_pss_mult(state,code):.1f}")
     ld["picks"]=all_picks[-500:]
-    with open("picks_log.json","w") as f: json.dump(json_safe(ld),f,indent=2)
+    try:
+        with open("picks_log.json","w") as f: json.dump(json_safe(ld),f,indent=2)
+    except Exception:
+        print("[V12] ERROR saving picks_log.json in learning cycle:")
+        traceback.print_exc(file=sys.stdout)
     return all_picks
 
 # ════════════════════════════════════════════════════════════
@@ -1297,8 +1306,7 @@ def analyze_game(game, state, ctx):
             elif ev>=0.03: pss+=3
 
             # Apply learned PSS multipliers
-            pss=apply_pss_mult(state,[c for c in sc if state["signal_accuracy"].get(c,{}).get("fires",0)>=10],pss) \
-                if hasattr(apply_pss_mult,'__call__') else pss
+            pss=apply_pss_mult(state,pss,[c for c in sc if state["signal_accuracy"].get(c,{}).get("fires",0)>=10])
 
             if ev<MIN_EV or tp<0.52: continue
             if pss<PSS_MIN_TOTAL: continue
@@ -1311,12 +1319,25 @@ def analyze_game(game, state, ctx):
             p=make_pick(f"{direction} {tl}",direction.upper(),odds,tp,pss,sigs[:3],sc,tl=tl,half_u=half_u)
             if p: picks.append(p)
 
-    # Cross-consistency check
+    # Cross-consistency check (Over vs Under — keep best only)
     overs=[p for p in picks if p["bet_type"]=="OVER"]
     unders=[p for p in picks if p["bet_type"]=="UNDER"]
     if overs and unders:
         best=max(overs+unders,key=lambda x:x["pss"])
         picks=[p for p in picks if p["bet_type"] not in ("OVER","UNDER")]+[best]
+
+    # Deduplication: one ML/RL/PL per game, one spread per game
+    # (totals already deduplicated above)
+    seen_ml={}; seen_spread={}; final=[]
+    for p in sorted(picks,key=lambda x:x["pss"],reverse=True):
+        bt=p.get("bet_type","ML"); gk=p.get("game","")
+        if bt in ("ML","RL","PL"):
+            if gk not in seen_ml: seen_ml[gk]=p; final.append(p)
+        elif bt=="SPREAD":
+            if gk not in seen_spread: seen_spread[gk]=p; final.append(p)
+        else:
+            final.append(p)  # totals already handled
+    picks=final
 
     return picks
 
@@ -1352,4 +1373,148 @@ def main():
     all_completed=[g for scores in all_sport_scores.values() for g in scores]
     yesterday_teams=get_yesterday_teams(all_completed)
 
-    # Update m
+    # Update monthly environment
+    for sp,scores in all_sport_scores.items():
+        for g in scores:
+            sc=g.get("scores") or []
+            if len(sc)>=2:
+                try:
+                    total=sum(float(s["score"]) for s in sc if s.get("score"))
+                    env=state.setdefault("environment",{}).setdefault(sp,{}).setdefault(
+                        TODAY_STR[:7],{"games":0,"sum_actual":0.0,"avg_actual":0.0})
+                    env["games"]+=1; env["sum_actual"]+=total
+                    env["avg_actual"]=round(env["sum_actual"]/env["games"],2)
+                except: pass
+
+    run_learning_cycle(state, all_sport_scores)
+
+    # ── Fetch today's games ───────────────────────────────
+    all_games=[]; sport_counts={}
+    opening_snapshot={}
+    for sp in active:
+        games=fetch_sport(sp)
+        if games:
+            sport_counts[SPORT_LABELS.get(sp,sp)]=len(games)
+            all_games.extend(games)
+            for g in games:
+                key=g.get("home_team","")+"|"+g.get("away_team","")
+                tc=total_consensus(g); ho,_=consensus(g,g.get("home_team",""),"h2h")
+                opening_snapshot[key]={
+                    "total":tc.get("Over",{}).get("line"),
+                    "over_odds":tc.get("Over",{}).get("odds"),
+                    "home_ml":ho,
+                }
+    print(f"[V12] Games: {sport_counts} | Total: {len(all_games)}")
+    if not _OPENING_LINES:
+        save_opening_lines(opening_snapshot)
+
+    ctx={"all_scores":all_completed,"yesterday_teams":yesterday_teams}
+
+    # ── Analyze all games ─────────────────────────────────
+    all_picks=[]
+    for game in all_games:
+        try: all_picks.extend(analyze_game(game,state,ctx))
+        except Exception as e: print(f"[V12] Skip: {e}")
+
+    # ── Deduplicate + rank + hard cap 5 ──────────────────
+    seen_game_total=set(); seen_game_ml=set(); seen_exact=set(); unique=[]
+    for p in sorted(all_picks,key=lambda x:x["market_score"],reverse=True):
+        exact_key=p["game"]+"|"+p["bet"]
+        if exact_key in seen_exact: continue
+        seen_exact.add(exact_key)
+        bt=p.get("bet_type","ML"); gk=p["game"]
+        if bt in ("OVER","UNDER"):
+            if gk in seen_game_total: continue
+            seen_game_total.add(gk)
+        else:
+            if gk in seen_game_ml: continue
+            seen_game_ml.add(gk)
+        unique.append(p)
+    # Hard cap: 3-5 picks max (V11 rule — quality over quantity)
+    picks=sorted(unique,key=lambda x:(x["pss"],x["ev_pct"]),reverse=True)[:5]
+
+    print(f"[V12] {len(all_picks)} candidates → {len(picks)} released (cap 5)")
+    for p in picks:
+        print(f"  [{p['sport']}] {p['game']} | {p['bet']} {p['odds']} | "
+              f"PSS:{p['pss']} EV:{p['ev_pct']}% {p['stars']}* | "
+              f"{','.join(p.get('signals_fired',['?'])[:3])}")
+    sys.stdout.flush()
+
+    # ── Build output ──────────────────────────────────────
+    try:
+        from zoneinfo import ZoneInfo
+        now_pt=datetime.now(ZoneInfo("America/Los_Angeles"))
+    except: now_pt=datetime.now(timezone.utc)
+
+    cal=state.get("calibration",{})
+    sa =state.get("signal_accuracy",{})
+    top_signals=[[c,round((s.get("wins",0)+5)/(s.get("wins",0)+s.get("losses",0)+10),3),
+                  s.get("fires",0)]
+                 for c,s in sorted(sa.items(),
+                     key=lambda x:(x[1].get("wins",0)+5)/(x[1].get("wins",0)+x[1].get("losses",0)+10),
+                     reverse=True) if s.get("fires",0)>=8][:6]
+
+    fp=json_safe(dict(picks[-1])) if picks else None
+    if fp: fp["is_free"]=True
+
+    out=json_safe({
+        "date":TODAY_STR,
+        "generated_at_pt":now_pt.strftime("%B %d, %Y %I:%M %p PT"),
+        "last_updated":now_pt.strftime("%I:%M %p PT"),
+        "model":"Manhattan Model V12 -- Ultimate Self-Learning",
+        "sports_checked":list(sport_counts.keys()),
+        "total_games":len(all_games),"total_released":len(picks),
+        "released_picks":picks,"premium_picks":picks,
+        "free_pick":fp,"best_play":picks[0] if picks else None,
+        "model_intelligence":{
+            "total_graded":state.get("total_graded",0),
+            "brier_score":cal.get("brier_30"),
+            "win_rate_30d":cal.get("win_rate_30"),
+            "probability_bias":cal.get("probability_bias",0),
+            "top_signals":top_signals,
+            "bet_type_accuracy":state.get("bet_type_accuracy",{}),
+            "xfip_active":(_PITCHER_STATS is not None),
+            "rss_injuries":len(_INJURY_TEAMS),
+            "rss_backup_goalies":len(_BACKUP_GOALIES),
+            "rlm_games_tracked":len(_OPENING_LINES),
+        }
+    })
+
+    # ── Save all files ────────────────────────────────────
+    try:
+        with open("pending_picks.json","w") as f: json.dump(out,f,indent=2)
+        print("[V12] pending_picks.json SAVED")
+    except Exception:
+        print("[V12] ERROR saving pending_picks.json:")
+        traceback.print_exc(file=sys.stdout)
+
+    try:
+        try:   raw=json.load(open("picks_log.json"))
+        except Exception: raw={}
+        if isinstance(raw,list): raw={"picks":raw}
+        existing=raw.get("picks",[])
+        existing_keys={str(p.get("game",""))+"|"+str(p.get("bet",""))+"|"+str(p.get("date",""))
+                       for p in existing}
+        for p in picks:
+            key=str(p.get("game",""))+"|"+str(p.get("bet",""))+"|"+TODAY_STR
+            if key not in existing_keys:
+                safe_p=json_safe(dict(p)); safe_p["date"]=TODAY_STR; existing.append(safe_p)
+        raw["picks"]=existing[-500:]
+        with open("picks_log.json","w") as f: json.dump(raw,f,indent=2)
+        print("[V12] picks_log.json SAVED")
+    except Exception:
+        print("[V12] ERROR saving picks_log.json:")
+        traceback.print_exc(file=sys.stdout)
+
+    try:
+        save_state(state)
+        print(f"[V12] model_state.json SAVED | {len(picks)} picks ready")
+    except Exception:
+        print("[V12] ERROR saving model_state.json:")
+        traceback.print_exc(file=sys.stdout)
+
+    sys.stdout.flush()
+    print("[V12] Complete.")
+
+if __name__=="__main__":
+    main()
