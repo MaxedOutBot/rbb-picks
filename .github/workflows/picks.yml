@@ -1,12 +1,12 @@
-name: Manhattan Model Auto Picks
+name: RicsBestBets — Generate Picks
 
 on:
   schedule:
-    - cron: '0 18 * * *'
-    - cron: '59 21 * * *'
-    - cron: '45 0 * * *'
-    - cron: '0 16 * * 6,0'
-    - cron: '0 20 * * 6,0'
+    - cron: '0 17 * * *'
+    - cron: '0 19 * * *'
+    - cron: '0 21 * * 6,0'
+    - cron: '0 23 * * *'
+    - cron: '45 1 * * *'
   workflow_dispatch:
 
 jobs:
@@ -15,16 +15,19 @@ jobs:
     permissions:
       contents: write
     steps:
-      - name: Checkout repo
-        uses: actions/checkout@v3
 
-      - name: Set up Python
-        uses: actions/setup-python@v4
+      - name: Checkout repo
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
         with:
           python-version: '3.11'
 
       - name: Install dependencies
-        run: pip install requests
+        run: pip install requests pybaseball feedparser
 
       - name: Run Manhattan Model
         env:
@@ -33,21 +36,16 @@ jobs:
 
       - name: Save picks to repo
         run: |
-          git config user.name "MaxedOutBot"
+          git config user.name "RBB Bot"
           git config user.email "bot@ricsbestbets.com"
-          git add pending_picks.json picks_log.json
-          git diff --staged --quiet || git commit -m "Auto picks $(date -u +%Y-%m-%d-%H%M)"
+          git add pending_picks.json picks_log.json model_state.json opening_lines.json || true
+          git diff --cached --quiet || git commit -m "Picks update $(date -u +%Y-%m-%d\ %H:%M\ UTC)"
           git push
 
-      - name: Notify Ric — picks ready for approval
+      - name: Notify Ric
         env:
           RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
-          RIC_EMAIL:      ${{ secrets.FROM_EMAIL }}
-        run: python notify_ric.py
+        run: python notify_ric.py || true
 
       - name: Keep repo active
-        run: |
-          git config user.name "MaxedOutBot"
-          git config user.email "bot@ricsbestbets.com"
-          git commit --allow-empty -m "Scheduled run $(date -u +%Y-%m-%d)"
-          git push
+        run: echo "Active $(date)" >> .keepalive && git add .keepalive && git diff --cached --quiet || git commit -m "keepalive" && git push || true
