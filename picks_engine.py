@@ -434,7 +434,20 @@ def fetch_sport(sport_key):
             params={"apiKey":KEY,"regions":"us","markets":"h2h,spreads,totals",
                     "oddsFormat":"american","dateFormat":"iso"},timeout=15)
         if not r.ok: return []
-        now=datetime.now(timezone.utc); cutoff=now+timedelta(minutes=10)
+        now=datetime.now(timezone.utc)
+        # Only games that haven't started yet (10-min buffer)
+        cutoff_min=now+timedelta(minutes=10)
+        # Only games starting TODAY in PT — never pull tomorrow's schedule
+        try:
+            from zoneinfo import ZoneInfo
+            pt=ZoneInfo("America/Los_Angeles")
+            today_pt=datetime.now(pt).date()
+            # Allow games up to 11:59 PM PT tonight
+            cutoff_max=datetime(today_pt.year,today_pt.month,today_pt.day,
+                                23,59,59,tzinfo=pt)
+        except Exception:
+            # Fallback: only games within next 12 hours
+            cutoff_max=now+timedelta(hours=12)
         out=[]
         for g in r.json():
             ct=g.get("commence_time","")
@@ -442,7 +455,8 @@ def fetch_sport(sport_key):
             try:
                 gt=datetime.fromisoformat(ct.replace("Z","+00:00"))
                 if gt.tzinfo is None: gt=gt.replace(tzinfo=timezone.utc)
-                if gt>cutoff:
+                # BOTH conditions: game hasn't started AND game is today
+                if gt>cutoff_min and gt<=cutoff_max:
                     g["_sport"]=sport_key; g["_ct_iso"]=ct; out.append(g)
             except: continue
         return out
