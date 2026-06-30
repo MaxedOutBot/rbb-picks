@@ -45,7 +45,20 @@ jobs:
       - name: Notify Ric
         env:
           RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
-        run: python notify_ric.py || true
+          RIC_EMAIL: ${{ secrets.RIC_EMAIL }}
+        run: |
+          python notify_ric.py
+        continue-on-error: true
+        id: notify
+
+      - name: Report notify status
+        if: always()
+        run: |
+          if [ "${{ steps.notify.outcome }}" = "failure" ]; then
+            echo "::warning::Notify Ric step FAILED — check the 'Notify Ric' step output above for details."
+          else
+            echo "Notify step completed — check the 'Notify Ric' step output above to confirm SUCCESS or FAIL/SKIP."
+          fi
 
       - name: Keep repo active
         run: echo "Active $(date)" >> .keepalive && git add .keepalive && git diff --cached --quiet || git commit -m "keepalive" && git push || true
