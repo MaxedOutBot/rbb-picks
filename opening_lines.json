@@ -65,5 +65,32 @@
       "over_odds": -115,
       "home_ml": -205
     }
+  },
+  "2026-06-30": {
+    "Houston Astros|Minnesota Twins": {
+      "total": 8.9,
+      "over_odds": -110,
+      "home_ml": -138
+    },
+    "Colorado Rockies|Miami Marlins": {
+      "total": 11.7,
+      "over_odds": -114,
+      "home_ml": 130
+    },
+    "Arizona Diamondbacks|San Francisco Giants": {
+      "total": 9.0,
+      "over_odds": -110,
+      "home_ml": -135
+    },
+    "Athletics|Los Angeles Dodgers": {
+      "total": 10.5,
+      "over_odds": -114,
+      "home_ml": 102
+    },
+    "Seattle Mariners|Los Angeles Angels": {
+      "total": 7.6,
+      "over_odds": -116,
+      "home_ml": -203
+    }
   }
 }
