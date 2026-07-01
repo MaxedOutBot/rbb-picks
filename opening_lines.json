@@ -92,5 +92,27 @@
       "over_odds": -116,
       "home_ml": -203
     }
+  },
+  "2026-07-01": {
+    "Colorado Rockies|Miami Marlins": {
+      "total": 11.0,
+      "over_odds": -114,
+      "home_ml": 115
+    },
+    "Arizona Diamondbacks|San Francisco Giants": {
+      "total": 9.0,
+      "over_odds": -104,
+      "home_ml": -113
+    },
+    "Athletics|Los Angeles Dodgers": {
+      "total": 11.0,
+      "over_odds": -119,
+      "home_ml": 151
+    },
+    "Seattle Mariners|Los Angeles Angels": {
+      "total": 7.0,
+      "over_odds": -119,
+      "home_ml": -189
+    }
   }
 }
