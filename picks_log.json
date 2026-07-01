@@ -1334,6 +1334,50 @@
       "result": null,
       "graded_at": null,
       "date": "2026-07-01"
+    },
+    {
+      "game": "Cincinnati Reds @ Milwaukee Brewers",
+      "sport": "MLB",
+      "sport_key": "baseball_mlb",
+      "bet": "Under 9.0",
+      "bet_type": "UNDER",
+      "odds": "-112",
+      "total_line": 9.0,
+      "stars": 4,
+      "units": 1.0,
+      "units_display": "1.0 Unit",
+      "signals": [
+        "System 1 Under: logit-scaled 66.0% | 9v9 | PSS 75",
+        "J-120/UNDER-G1: Series G1 Under (70%)",
+        "9v9 books on Under"
+      ],
+      "signals_fired": [
+        "G1_UNDER",
+        "BOOKS_5_UNDER",
+        "HIGH_EV_TOTAL"
+      ],
+      "pss": 75,
+      "ev_pct": 24.93,
+      "true_prob": 66.0,
+      "sim_pct": 65.74,
+      "ci_range": 1.9,
+      "series_game": 1,
+      "series_desc": "G1",
+      "home_era": 3.12,
+      "away_era": 3.9,
+      "home_xfip": 3.12,
+      "home_xfip_metric": "ERA",
+      "away_xfip": 3.9,
+      "away_xfip_metric": "ERA",
+      "opening_odds": -158,
+      "clv_close": null,
+      "market_score": 75,
+      "released": true,
+      "is_free": false,
+      "tag": "NO TAG",
+      "result": null,
+      "graded_at": null,
+      "date": "2026-07-01"
     }
   ]
 }
