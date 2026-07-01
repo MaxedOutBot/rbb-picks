@@ -1128,6 +1128,12 @@ def analyze_game(game, state, ctx):
     # ── ROWS 5 & 6: Totals — full signal framework ───────
     if o_data and u_data:
         o_odds=o_data["odds"]; u_odds=u_data["odds"]; tl=o_data["line"]
+        # MLB totals always post at .5 increments (7.5, 8.5, 9.5, 10.5 etc)
+        # Snap averaged decimals like 9.3 or 10.9 to nearest .5
+        if is_mlb and tl:
+            import math
+            whole = math.floor(tl)
+            tl = whole + 0.5
         o_imp,u_imp=a2p(o_odds),a2p(u_odds)
         # Power devig for totals too
         o_true,u_true=power_devig(o_imp,u_imp)
@@ -1431,7 +1437,23 @@ def main():
             seen_game_ml.add(gk)
         unique.append(p)
     # Hard cap: 3-5 picks max (V11 rule — quality over quantity)
-    picks=sorted(unique,key=lambda x:(x["pss"],x["ev_pct"]),reverse=True)[:5]
+    # Enforce mix: max 2 totals (Over/Under) in any 5-pick slate so ML picks always get slots
+    all_sorted = sorted(unique, key=lambda x:(x["pss"],x["ev_pct"]), reverse=True)
+    totals_added = 0; ml_added = 0; picks = []
+    for p in all_sorted:
+        bt = p.get("bet_type","ML")
+        is_total = bt in ("OVER","UNDER")
+        if is_total:
+            if totals_added >= 2: continue   # max 2 totals per slate
+            totals_added += 1
+        else:
+            ml_added += 1
+        picks.append(p)
+        if len(picks) >= 5: break
+    # If we ran out of ML picks but have room, fill with remaining totals
+    if len(picks) < 5:
+        remaining = [p for p in all_sorted if p not in picks]
+        picks += remaining[:5-len(picks)]
 
     print(f"[V12] {len(all_picks)} candidates → {len(picks)} released (cap 5)")
     for p in picks:
